@@ -6,6 +6,8 @@ const mongoose = require("mongoose");
 const HttpError = require("./models/http.error");
 // Users
 const userRoutes = require("./routes/user-routes");
+const specieltyRoutes = require("./routes/specielty-routes");
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -18,6 +20,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/users", userRoutes); // /api/users
+app.use("/api/specialty", specieltyRoutes); // /api/specialty
 
 // Manejo rutas no definidas
 app.use((req, res, next) => {
