@@ -6,9 +6,10 @@ const checkAuth = require('../middleware/check-auth');
 const checkAdmin = require('../middleware/checkAdmin');
 
 const router = express.Router();
-
+// Ruta para mostrar todas las especialidades
 router.get('/', checkAuth, specialtyController.getSpecialties);
 
+// Ruta para agregar una nueva Especialidad (solo disponible como admin)
 router.post(
   '/',
   checkAuth,
