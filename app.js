@@ -34,8 +34,8 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || "Error desconocido" });
 });
 
+const mongoURL = 'mongodb+srv://agustin:' + process.env.DB_PASSWORD + '@cluster0.gh2t0ok.mongodb.net/?retryWrites=true&w=majority';
 
-const mongoURL = 'mongodb+srv://agustin:' + process.env.DB_PASSWORD + '@cluster0.9jzc9h0.mongodb.net/?retryWrites=true&w=majority';
 
 // Conexión a la base de datos
 mongoose
