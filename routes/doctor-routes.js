@@ -11,9 +11,20 @@ router.post(
   "/",
   checkAuth,
   checkAdmin,
-  [check("name").not().isEmpty(),
-  check("specialty").not().isEmpty()],
+  [check("name").not().isEmpty(), check("specialty").not().isEmpty()],
   doctorController.createDoctor
 );
+
+// Ruta para actualizar información de un médico (solo disponible como admin)
+router.patch(
+  "/:doctorId",
+  checkAuth,
+  checkAdmin,
+  doctorController.updateDoctor
+);
+
+// Ruta para obtener todos los médicos registrados
+router.get("/", doctorController.getAllDoctors);
+
 
 module.exports = router;

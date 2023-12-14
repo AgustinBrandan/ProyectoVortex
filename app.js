@@ -8,6 +8,7 @@ const HttpError = require("./models/http.error");
 const userRoutes = require("./routes/user-routes");
 const specieltyRoutes = require("./routes/specielty-routes");
 const doctorRoutes = require("./routes/doctor-routes");
+const appointmentRoutes = require("./routes/appointment-routes");
 
 const app = express();
 
@@ -22,7 +23,8 @@ app.use((req, res, next) => {
 
 app.use("/api/users", userRoutes); // /api/users
 app.use("/api/specialty", specieltyRoutes); // /api/specialty
-app.use("/api/doctor", doctorRoutes); // /api/doctor
+app.use("/api/doctors", doctorRoutes); // /api/doctor
+app.use("/api/appointments", appointmentRoutes); // /api/appointment
 
 // Manejo rutas no definidas
 app.use((req, res, next) => {

@@ -12,7 +12,7 @@ const createSpecialty = async (req, res, next) => {
       };
   
       const individualErrors = errors.array().map((error) => {
-        const message = errorMap[error.param];
+        const message = errorMap[error.path];
         return message ? message : 'Revisar los datos';
       });
   
