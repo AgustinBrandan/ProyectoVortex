@@ -23,7 +23,7 @@ router.patch(
     checkAuth,
     checkAdmin,
     [
-      check("hour").optional().isString().notEmpty(),
+      check("dateTime").optional().isISO8601().toDate(),
       check("status").optional().isString().notEmpty(),
       check("user").optional().isString().notEmpty(),
     ],

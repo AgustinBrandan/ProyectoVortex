@@ -10,7 +10,6 @@ const appointmentSchema = new Schema({
     type: Date,
     required: true
   },
-  hour: { type: String, required: true },
   status: { type: String, enum: ['available', 'confirmed', 'canceled'], default: 'available' }
 });
 

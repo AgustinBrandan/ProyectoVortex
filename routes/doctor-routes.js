@@ -24,7 +24,7 @@ router.patch(
 );
 
 // Ruta para obtener todos los médicos registrados
-router.get("/", doctorController.getAllDoctors);
+router.get("/", checkAuth ,doctorController.getAllDoctors);
 
 
 module.exports = router;

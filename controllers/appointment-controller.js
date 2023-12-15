@@ -11,7 +11,7 @@ const createAppointment = async (req, res, next) => {
   if (!errors.isEmpty()) {
     const errorMap = {
       doctorId: "Debes ingresar un doctor",
-      dateTime: "Ingrese fecha y hora en formato ISO8601",
+      dateTime: "Ingrese fecha y hora en formato YYYY-MM-DDTHH:MM:SS.000Z",
     };
 
     const individualErrors = errors.array().map((error) => {
@@ -45,16 +45,10 @@ const createAppointment = async (req, res, next) => {
       );
     }
 
-    const dateObject = new Date(dateTime);
-
-    const formattedDateTime = dateObject.toISOString(); // Formato ISO8601 de fecha y hora
-    const hour = formattedDateTime.split("T")[1].slice(0, 5); // Extraer la hora de la cadena ISO8601
-
     // Crear un nuevo turno
     const newAppointment = new Appointment({
       doctor: doctorId,
       dateTime,
-      hour,
     });
 
     await newAppointment.save();
@@ -73,7 +67,7 @@ const updateAppointment = async (req, res, next) => {
 
   if (!errors.isEmpty()) {
     const errorMap = {
-      dateTime: "Ingrese fecha ",
+      dateTime: "Ingrese fecha y hora en formato YYYY-MM-DDTHH:MM:SS.000Z",
     };
     const individualErrors = errors.array().map((error) => {
       const message = errorMap[error.path];
@@ -85,38 +79,35 @@ const updateAppointment = async (req, res, next) => {
     }
   }
 
-  const { dateTime, status, user } = req.body;
 
   try {
-    const dateObject = new Date(dateTime);
-
-    if (isNaN(dateObject.getTime())) { // Verificar si la fecha es inválida
-      return next(new HttpError("Fecha inválida. Ingrese una fecha válida en formato Año-Mes-Día", 422));
-    }
-
-    const formattedDateTime = dateObject.toISOString(); // Formato ISO8601 de fecha y hora
-    const hourformat = formattedDateTime.split("T")[1].slice(0, 5); // Extraer la hora de la cadena ISO8601
-
     const appointment = await Appointment.findById(appointmentId);
 
     if (!appointment) {
       return res.status(404).json({ message: "Turno no encontrado" });
     }
 
-    appointment.dateTime = formattedDateTime;
-    appointment.hour = hourformat;
-    appointment.status = status;
-    appointment.user = user;
+    // Check and update fields if they exist in the request body
+    if ("dateTime" in req.body) {
+      appointment.dateTime = req.body.dateTime;
+    }
+
+    if ("status" in req.body) {
+      appointment.status = req.body.status;
+    }
+
+    if ("user" in req.body) {
+      appointment.user = req.body.user;
+    }
 
     await appointment.save();
 
     res.status(200).json({ appointment });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error al actualizar el turno" });
   }
 };
-
-
 
 module.exports = {
   createAppointment,
