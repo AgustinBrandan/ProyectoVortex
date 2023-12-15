@@ -45,6 +45,8 @@ const createDoctor = async (req, res, next) => {
     const newDoctor = new Doctor({
       name,
       specialty: doctorSpecialty._id,
+      appointments: []
+
     });
 
     await newDoctor.save();
@@ -73,29 +75,32 @@ const updateDoctor = async (req, res, next) => {
       doctor.name = name;
     }
 
-    // Si se proporciona una especialidad, actualizarla 
+    // Si se proporciona una especialidad, actualizarla
     if (specialty) {
       const doctorSpecialty = await Specialty.findOne({ name: specialty });
 
       if (!doctorSpecialty) {
-        return next(new HttpError("La especialidad especificada no existe.", 404));
+        return next(
+          new HttpError("La especialidad especificada no existe.", 404)
+        );
       }
 
       doctor.specialty = doctorSpecialty._id;
     }
 
-   
     await doctor.save();
 
     res.status(200).json({ doctor: doctor });
   } catch (error) {
-    return next(new HttpError("No se pudo actualizar al médico, inténtalo de nuevo", 500));
+    return next(
+      new HttpError("No se pudo actualizar al médico, inténtalo de nuevo", 500)
+    );
   }
 };
 
 const getAllDoctors = async (req, res, next) => {
   try {
-    const doctors = await Doctor.find().populate('specialty', 'name'); // Utilizamos populate para obtener los nombres de las especialidades
+    const doctors = await Doctor.find().populate("specialty", "name"); // Utilizamos populate para obtener los nombres de las especialidades
 
     res.status(200).json({ doctors: doctors });
   } catch (error) {
@@ -103,38 +108,35 @@ const getAllDoctors = async (req, res, next) => {
   }
 };
 
-// const getDoctorDetails = async (req, res, next) => {
-//   const doctorId = req.params.doctorId;
 
-//   try {
-//     const doctor = await Doctor.findById(doctorId).populate('specialty', 'name').populate({
-//       path: 'appointments',
-//       match: { status: 'available' }, // Filtramos solo los turnos disponibles
-//       select: 'date hour status'
-//     });
+const getDoctorDetails = async (req, res, next) => {
+  const doctorId = req.params.doctorId;
 
-//     if (!doctor) {
-//       return next(new HttpError("El médico no se encontró en el sistema", 404));
-//     }
+  try {
+    const doctor = await Doctor.findById(doctorId)
+      .populate("specialty", "name")
+      .populate({
+        path: "appointments",
+        match: { status: "available" }, // Filtrar citas con status "available"
+        select: "dateTime status", // Seleccionar campos necesarios
+      });
 
-//     res.status(200).json({ doctor: doctor });
-//   } catch (error) {
-//     return next(new HttpError("No se pudo obtener el detalle del médico", 500));
-//   }
-// };
+    if (!doctor) {
+      return next(new HttpError("El médico no se encontró en el sistema", 404));
+    }
+
+    res.status(200).json({ doctor: doctor });
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError("No se pudo obtener el detalle del médico", 500));
+  }
+};
+
+
 
 module.exports = {
   createDoctor,
   updateDoctor,
   getAllDoctors,
-  // getDoctorDetails,
+  getDoctorDetails,
 };
-
-
-module.exports = {
-  createDoctor,
-  updateDoctor,
-  getAllDoctors
-};
-
-

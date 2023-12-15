@@ -53,6 +53,10 @@ const createAppointment = async (req, res, next) => {
 
     await newAppointment.save();
 
+    // Asociar la nueva cita al médico
+    existingDoctor.appointments.push(newAppointment._id);
+    await existingDoctor.save();
+
     res.status(201).json({ appointment: newAppointment });
   } catch (error) {
     return next(new HttpError("No se pudo crear el turno.", 500));
@@ -109,7 +113,69 @@ const updateAppointment = async (req, res, next) => {
   }
 };
 
+const deleteAppointment = async (req, res, next) => {
+  const { appointmentId } = req.params; // Suponiendo que tienes el ID del turno a eliminar en los parámetros de la URL
+
+  try {
+    // Verificar si el turno existe
+    const existingAppointment = await Appointment.findById(appointmentId);
+    if (!existingAppointment) {
+      return next(new HttpError("El turno no existe.", 404));
+    }
+    // Eliminar el turno
+    await Appointment.findByIdAndDelete(appointmentId);
+
+    res.status(200).json({ message: "Turno eliminado exitosamente." });
+  } catch (error) {
+    return next(new HttpError("No se pudo eliminar el turno.", 500));
+  }
+};
+
+const listAppointmentsByDoctor = async (req, res, next) => {
+  const doctorId = req.params.doctorId;
+
+  try {
+    // Buscar las citas del médico por su ID
+    const appointments = await Appointment.find({ doctor: doctorId })
+      .populate("doctor", "name") // Agregar información del médico (opcional)
+      .select("dateTime status"); // Seleccionar campos necesarios
+
+    if (!appointments || appointments.length === 0) {
+      return res.status(404).json({ message: "No se encontraron turnos para este médico." });
+    }
+
+    res.status(200).json({ appointments: appointments });
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError("No se pudieron listar los turnos del médico.", 500));
+  }
+};
+
+const listAppointmentsByPatient = async (req, res, next) => {
+  const userId = req.params.userId;
+
+  try {
+    // Buscar las citas del paciente por su ID de usuario
+    const appointments = await Appointment.find({ user: userId })
+      .populate("doctor", "name") // Agregar información del médico
+      .select("dateTime status"); // Seleccionar campos necesarios
+
+    if (!appointments || appointments.length === 0) {
+      return res.status(404).json({ message: "No se encontraron turnos para este paciente." });
+    }
+
+    res.status(200).json({ appointments: appointments });
+  } catch (error) {
+    console.log(error);
+    return next(new HttpError("No se pudieron listar los turnos del paciente.", 500));
+  }
+};
+
+
 module.exports = {
   createAppointment,
   updateAppointment,
+  deleteAppointment,
+  listAppointmentsByDoctor,
+  listAppointmentsByPatient,
 };
