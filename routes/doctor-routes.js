@@ -4,30 +4,46 @@ const { check } = require("express-validator");
 const router = express.Router();
 const doctorController = require("../controllers/doctor-controller");
 const checkAuth = require("../middleware/check-auth");
-const checkAdmin = require("../middleware/checkAdmin");
+const checkRole = require("../middleware/checkRole");
 
-// Ruta para agregar un nuevo médico (solo disponible como admin)
+router.use(checkAuth);
+// Ruta para agregar un nuevo médico (ADMINISTRADOR)
 router.post(
   "/",
-  checkAuth,
-  checkAdmin,
-  [check("name").not().isEmpty(), check("specialty").not().isEmpty()],
+  checkRole("admin"),
+  [
+    check("name").not().isEmpty().withMessage("El nombre no puede estar vacio"),
+    check("specialty")
+      .not()
+      .isEmpty()
+      .withMessage("La especialidad no puede estar vacio"),
+  ],
   doctorController.createDoctor
 );
 
-// Ruta para actualizar información de un médico (solo disponible como admin)
+// Ruta para actualizar información de un médico (ADMINISTRADOR)
 router.patch(
   "/:doctorId",
-  checkAuth,
-  checkAdmin,
+  checkRole("admin"),
+  [
+    check("name")
+      .optional()
+      .not()
+      .isEmpty()
+      .withMessage("El nombre no puede estar vacio"),
+    check("specialty")
+      .optional()
+      .not()
+      .isEmpty()
+      .withMessage("La especialidad no puede estar vacio"),
+  ],
   doctorController.updateDoctor
 );
 
 // Ruta para obtener todos los médicos registrados
-router.get("/", checkAuth ,doctorController.getAllDoctors);
+router.get("/", doctorController.getAllDoctors);
 
 // Ruta para obtener detalles de un médico y sus turnos disponibles
-router.get('/:doctorId',checkAuth, doctorController.getDoctorDetails);
-
+router.get("/:doctorId", doctorController.getDoctorDetails);
 
 module.exports = router;

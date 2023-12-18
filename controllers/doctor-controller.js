@@ -4,23 +4,14 @@ const Doctor = require("../models/doctor");
 const Specialty = require("../models/specialty");
 
 const createDoctor = async (req, res, next) => {
+
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const errorMap = {
-      name: "El nombre del medico no puede estar vacío",
-      specialty: "Ingrese una especialidad",
-    };
-
-    const individualErrors = errors.array().map((error) => {
-      const message = errorMap[error.path];
-      return message ? message : "Revisar los datos";
-    });
-
-    if (individualErrors.length > 0) {
-      return next(new HttpError(individualErrors, 422));
-    }
+    const errorMessages = errors.array().map((error) => error.msg);
+    return res.status(422).json({ errors: errorMessages });
   }
+
   const { name, specialty } = req.body;
 
   try {
@@ -63,6 +54,14 @@ const updateDoctor = async (req, res, next) => {
   const doctorId = req.params.doctorId;
   const { name, specialty } = req.body;
 
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const errorMessages = errors.array().map((error) => error.msg);
+    return res.status(422).json({ errors: errorMessages });
+  }
+
+
   try {
     let doctor = await Doctor.findById(doctorId);
 
@@ -70,19 +69,15 @@ const updateDoctor = async (req, res, next) => {
       return next(new HttpError("El médico no se encontró en el sistema", 404));
     }
 
-    // Si se proporciona un nombre, actualizar el nombre del médico
-    if (name) {
-      doctor.name = name;
-    }
+    // Actualizar el nombre si se proporciona en la solicitud
+    doctor.name = name || doctor.name;
 
-    // Si se proporciona una especialidad, actualizarla
+    // Actualizar la especialidad si se proporciona en la solicitud
     if (specialty) {
       const doctorSpecialty = await Specialty.findOne({ name: specialty });
 
       if (!doctorSpecialty) {
-        return next(
-          new HttpError("La especialidad especificada no existe.", 404)
-        );
+        return next(new HttpError("La especialidad especificada no existe.", 404));
       }
 
       doctor.specialty = doctorSpecialty._id;
@@ -92,11 +87,10 @@ const updateDoctor = async (req, res, next) => {
 
     res.status(200).json({ doctor: doctor });
   } catch (error) {
-    return next(
-      new HttpError("No se pudo actualizar al médico, inténtalo de nuevo", 500)
-    );
+    return next(new HttpError("No se pudo actualizar al médico, inténtalo de nuevo", 500));
   }
 };
+
 
 const getAllDoctors = async (req, res, next) => {
   try {

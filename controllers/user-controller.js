@@ -20,19 +20,8 @@ const signup = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const errorMap = {
-      name: "El nombre no puede estar vacío",
-      email: "El correo electrónico no es válido",
-      password: "La contraseña debe tener al menos 6 caracteres",
-    };
-    const individualErrors = errors.array().map((error) => {
-      const message = errorMap[error.path];
-      return message ? message : "Revisar los datos";
-    });
-
-    if (individualErrors.length > 0) {
-      return next(new HttpError(individualErrors, 422));
-    }
+    const errorMessages = errors.array().map((error) => error.msg);
+    return res.status(422).json({ errors: errorMessages });
   }
 
   const { name, email, password, role } = User(req.body);
@@ -95,6 +84,14 @@ const signup = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
+    // Validacion de datos
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map((error) => error.msg);
+      return res.status(422).json({ errors: errorMessages });
+    }
+    
   const { email, password } = req.body;
 
   try {
