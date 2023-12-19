@@ -38,8 +38,15 @@ router.post(
   usersController.login
 );
 
+router.post("/send-email",usersController.sendRecoveryEmail)
+
+router.post(
+  '/reset-password',usersController.resetPassword)
+
 router.use(checkAuth);
 
 router.get("/", checkRole("admin"), usersController.getUsers);
+
+
 
 module.exports = router;

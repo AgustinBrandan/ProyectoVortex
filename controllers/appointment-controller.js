@@ -169,8 +169,8 @@ const reserveAppointment = async (req, res, next) => {
     }
 
     // Actualizar el turno reservándolo para el usuario
-    existingAppointment.status = 'reserved'; // Cambiar el estado del turno a 'reserved'
-    existingAppointment.user = userId; // Asociar el turno con el usuario que lo reservó
+    existingAppointment.status = 'reserved'; 
+    existingAppointment.user = userId; 
 
     await existingAppointment.save();
 

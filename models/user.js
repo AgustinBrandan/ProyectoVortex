@@ -7,7 +7,9 @@ const userSchema = new Schema({
   name: { type: String, require: true },
   email: { type: String, require: true, unique: true },
   password: { type: String, require: true, minlength: 6 },
-  role: { type: String, enum: ["user", "admin"], default: "user" }
+  role: { type: String, enum: ["user", "admin"], default: "user" },
+  resetToken: { type: String }, // Token para restablecer la contraseña
+  resetTokenExpiration: { type: Date }, // Tiempo de expiración del token
 });
 
 userSchema.plugin(uniqueValidator);
