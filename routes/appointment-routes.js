@@ -68,13 +68,20 @@ router.get(
 );
 // Reservar un turno
 router.patch(
-  "/reservar/:appointmentId/paciente/:userId",
+  "/reservar/:appointmentId",
   checkRole("user"),
   appointmentController.reserveAppointment
 );
 // Cancelar turno
-router.patch("/cancelar/:appointmentId/paciente/:userId", checkRole("user"), appointmentController.cancelAppointment);
+router.patch(
+  "/cancelar/:appointmentId",
+  checkRole("user"),
+  appointmentController.cancelAppointment
+);
 
-router.get("/cancelaciones/:userId", checkRole("user"), appointmentController.getCanceledAppointmentsByUser);
+router.get(
+  "/cancelaciones/:userId",
+  appointmentController.getCanceledAppointmentsByUser
+);
 
 module.exports = router;

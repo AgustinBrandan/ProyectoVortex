@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const specialtySchema = new Schema({
   name: { type: String, required: true, unique: true },
-  description: { type: String, required: true }
+  description: { type: String, required: true },
 });
 
 specialtySchema.plugin(uniqueValidator);

@@ -46,7 +46,7 @@ const createAppointment = async (req, res, next) => {
     existingDoctor.appointments.push(newAppointment._id);
     await existingDoctor.save();
 
-    res.status(201).json({ appointment: newAppointment });
+    res.status(201).json({ message: "El turno fue creado con éxito" });
   } catch (error) {
     return next(new HttpError("No se pudo crear el turno.", 500));
   }
@@ -78,16 +78,15 @@ const updateAppointment = async (req, res, next) => {
 
     await appointment.save();
 
-    res.status(200).json({ appointment });
+    res.status(200).json({ message: "El turno fue actualizado con exito." });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Error al actualizar el turno" });
   }
 };
 
-
 const deleteAppointment = async (req, res, next) => {
-  const { appointmentId } = req.params; 
+  const { appointmentId } = req.params;
 
   try {
     // Verificar si el turno existe
@@ -106,7 +105,7 @@ const deleteAppointment = async (req, res, next) => {
 
 const listAppointmentsByDoctor = async (req, res, next) => {
   // const doctorId = req.params.doctorId;
-  const { doctorId } = req.params; 
+  const { doctorId } = req.params;
 
   try {
     // Buscar las citas del médico por su ID
@@ -131,7 +130,7 @@ const listAppointmentsByDoctor = async (req, res, next) => {
 
 const listAppointmentsByPatient = async (req, res, next) => {
   // const userId = req.params.userId;
-  const { userId } = req.params; 
+  const { userId } = req.params;
 
   try {
     // Buscar las citas del paciente por su ID de usuario
@@ -155,55 +154,59 @@ const listAppointmentsByPatient = async (req, res, next) => {
 };
 
 const reserveAppointment = async (req, res, next) => {
-  const { appointmentId,userId } = req.params; 
-  
+  const { appointmentId } = req.params;
+
   try {
     // Verificar si el turno existe y está disponible para reserva
     const existingAppointment = await Appointment.findOne({
       _id: appointmentId,
-      status: 'available',
+      status: "available",
     });
 
     if (!existingAppointment) {
-      return res.status(404).json({ message: "El turno no está disponible para reserva." });
+      return res
+        .status(404)
+        .json({ message: "El turno no está disponible para reserva." });
     }
 
     // Actualizar el turno reservándolo para el usuario
-    existingAppointment.status = 'reserved'; 
-    existingAppointment.user = userId; 
+    existingAppointment.status = "reserved";
+    existingAppointment.user = req.userData.userId;
 
     await existingAppointment.save();
 
-    res.status(200).json({ appointment: existingAppointment });
+    res.status(200).json({ message: "Turno reservado con exito." });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "No se pudo reservar el turno existente." });
+    return res
+      .status(500)
+      .json({ message: "No se pudo reservar el turno existente." });
   }
 };
 
 const cancelAppointment = async (req, res, next) => {
-  const { appointmentId,userId } = req.params;
-
+  const { appointmentId } = req.params;
 
   try {
-
     // Buscar el turno por ID
     const existingAppointment = await Appointment.findOne({
       _id: appointmentId,
-      user: userId,
-      status: 'reserved',
+      user: req.userData.userId,
+      status: "reserved",
     });
 
     if (!existingAppointment) {
-      return res.status(404).json({ message: "El turno no está disponible para cancelar." });
+      return res
+        .status(404)
+        .json({ message: "El turno no está disponible para cancelar." });
     }
 
     // Actualizar el estado del turno a 'canceled'
-    existingAppointment.status = 'canceled';
+    existingAppointment.status = "canceled";
 
     await existingAppointment.save();
 
-    res.status(200).json({ appointment: existingAppointment });
+    res.status(200).json({ message: "Turno cancelado con exito." });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "No se pudo cancelar el turno." });
@@ -211,24 +214,23 @@ const cancelAppointment = async (req, res, next) => {
 };
 
 const getCanceledAppointmentsByUser = async (req, res, next) => {
-  const { userId } = req.params
+  const { userId } = req.params;
 
   try {
     // Buscar todos los turnos cancelados por el usuario
     const canceledAppointments = await Appointment.find({
       user: userId,
-      status: 'canceled',
+      status: "canceled",
     });
 
     res.status(200).json({ canceledAppointments });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Error al obtener el historial de cancelaciones." });
+    return res
+      .status(500)
+      .json({ message: "Error al obtener el historial de cancelaciones." });
   }
 };
-
-
-
 
 module.exports = {
   createAppointment,
@@ -238,5 +240,5 @@ module.exports = {
   listAppointmentsByPatient,
   reserveAppointment,
   cancelAppointment,
-  getCanceledAppointmentsByUser
+  getCanceledAppointmentsByUser,
 };

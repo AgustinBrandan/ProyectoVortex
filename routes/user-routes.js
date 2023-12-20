@@ -38,15 +38,30 @@ router.post(
   usersController.login
 );
 
-router.post("/send-email",usersController.sendRecoveryEmail)
+router.post(
+  "/send-email",
+  [
+    check("email")
+      .normalizeEmail()
+      .isEmail()
+      .withMessage("El correo electrónico no es válido"),
+  ],
+  usersController.sendRecoveryEmail
+);
 
 router.post(
-  '/reset-password',usersController.resetPassword)
+  "/reset-password",
+  [
+    check("token").not().isEmpty().withMessage("El token no puede estar vacío"),
+    check("newPassword")
+      .isLength({ min: 6 })
+      .withMessage("La contraseña debe tener al menos 6 caracteres"),
+  ],
+  usersController.resetPassword
+);
 
 router.use(checkAuth);
 
 router.get("/", checkRole("admin"), usersController.getUsers);
-
-
 
 module.exports = router;

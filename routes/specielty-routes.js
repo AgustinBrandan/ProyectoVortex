@@ -5,7 +5,6 @@ const specialtyController = require("../controllers/specialty-controller");
 const checkAuth = require("../middleware/check-auth");
 const checkRole = require("../middleware/checkRole");
 
-
 const router = express.Router();
 
 router.use(checkAuth);

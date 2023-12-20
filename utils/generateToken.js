@@ -7,6 +7,7 @@ const generateUniqueToken = () => {
   for (let i = 0; i < tokenLength; i++) {
     token += characters.charAt(Math.floor(Math.random() * characters.length));
   }
+
   return token;
 };
 

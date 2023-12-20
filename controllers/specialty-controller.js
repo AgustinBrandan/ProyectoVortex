@@ -22,7 +22,7 @@ const createSpecialty = async (req, res, next) => {
     const newSpecialty = new Specialty({ name, description });
     await newSpecialty.save();
 
-    res.status(201).json({ specialty: newSpecialty });
+    res.status(201).json({ message: "Especialidad creada con éxito" });
   } catch (err) {
     return next(
       new HttpError("No se pudo crear la especialidad, inténtalo de nuevo", 500)
