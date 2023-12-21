@@ -50,9 +50,8 @@ router.post(
 );
 
 router.post(
-  "/reset-password",
+  "/reset-password/:token",
   [
-    check("token").not().isEmpty().withMessage("El token no puede estar vacío"),
     check("newPassword")
       .isLength({ min: 6 })
       .withMessage("La contraseña debe tener al menos 6 caracteres"),

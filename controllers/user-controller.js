@@ -9,8 +9,14 @@ const { generateUniqueToken } = require("./../utils/generateToken");
 const User = require("../models/user");
 
 const getUsers = async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1; // Página actual (predeterminada: 1)
+  const limit = parseInt(req.query.limit) || 10; // Límite de usuarios por página (predeterminado: 10)
+
   try {
-    const users = await User.find({}, "-password");
+    const users = await User.find({}, "-password")
+      .skip((page - 1) * limit) // Salta los usuarios según la página y el límite
+      .limit(limit);
+
     res.json({ users });
   } catch (err) {
     return next(new HttpError("No se pudieron obtener los usuarios", 500));
@@ -130,7 +136,7 @@ const sendRecoveryEmail = async (req, res, next) => {
 
     await user.save();
 
-    const resetLink = `http://localhost:5000/api/user/reset-password?token=${token}`; // URL de tu ruta de restablecimiento de contraseña
+    const resetLink = `http://localhost:5000/api/user/reset-password/${token}`; // URL de tu ruta de restablecimiento de contraseña
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -166,7 +172,8 @@ const resetPassword = async (req, res, next) => {
     return res.status(422).json({ errors: errorMessages });
   }
 
-  const { token, newPassword } = req.body;
+  const token = req.params.token;
+  const { newPassword } = req.body;
 
   try {
     const user = await User.findOne({
@@ -205,8 +212,10 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
-exports.getUsers = getUsers;
-exports.signup = signup;
-exports.login = login;
-exports.sendRecoveryEmail = sendRecoveryEmail;
-exports.resetPassword = resetPassword;
+module.exports = {
+  getUsers,
+  signup,
+  login,
+  sendRecoveryEmail,
+  resetPassword,
+};

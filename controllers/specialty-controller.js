@@ -31,8 +31,16 @@ const createSpecialty = async (req, res, next) => {
 };
 
 const getSpecialties = async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+
   try {
-    const specialties = await Specialty.find({});
+    const skip = (page - 1) * limit;
+
+    const specialties = await Specialty.find({})
+      .skip(skip)
+      .limit(limit);
+
     res.json({ specialties });
   } catch (error) {
     return next(new HttpError("No se pudo obtener las especialidades", 500));

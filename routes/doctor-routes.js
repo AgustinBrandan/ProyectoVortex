@@ -30,7 +30,7 @@ router.patch(
       .optional()
       .not()
       .isEmpty()
-      .withMessage("El nombre no puede estar vacio"),
+      .withMessage("El campo name no puede estar vacio"),
     check("specialty")
       .optional()
       .not()

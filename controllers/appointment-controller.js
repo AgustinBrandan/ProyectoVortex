@@ -1,6 +1,5 @@
 const { validationResult } = require("express-validator");
 const HttpError = require("../models/http.error");
-
 const Appointment = require("../models/appointment");
 const Doctor = require("../models/doctor");
 
@@ -104,14 +103,17 @@ const deleteAppointment = async (req, res, next) => {
 };
 
 const listAppointmentsByDoctor = async (req, res, next) => {
-  // const doctorId = req.params.doctorId;
   const { doctorId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
 
   try {
-    // Buscar las citas del médico por su ID
+    const skip = (page - 1) * limit;
+
     const appointments = await Appointment.find({ doctor: doctorId })
-      .populate("doctor", "name") // Agregar información del médico
-      .select("dateTime status"); // Seleccionar campos necesarios
+      .select("dateTime status")
+      .skip(skip)
+      .limit(limit);
 
     if (!appointments || appointments.length === 0) {
       return res
@@ -119,24 +121,28 @@ const listAppointmentsByDoctor = async (req, res, next) => {
         .json({ message: "No se encontraron turnos para este médico." });
     }
 
-    res.status(200).json({ appointments: appointments });
+    res.status(200).json({ appointments });
   } catch (error) {
     console.log(error);
-    return next(
-      new HttpError("No se pudieron listar los turnos del médico.", 500)
-    );
+    return next(new HttpError("No se pudieron listar los turnos del médico.", 500));
   }
 };
 
+
 const listAppointmentsByPatient = async (req, res, next) => {
-  // const userId = req.params.userId;
-  const { userId } = req.params;
+  const userId = req.userData.userId; 
+
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
 
   try {
-    // Buscar las citas del paciente por su ID de usuario
+    const skip = (page - 1) * limit;
+
     const appointments = await Appointment.find({ user: userId })
-      .populate("doctor", "name") // Agregar información del médico
-      .select("dateTime status"); // Seleccionar campos necesarios
+      .populate("doctor", "name")
+      .select("dateTime status")
+      .skip(skip)
+      .limit(limit);
 
     if (!appointments || appointments.length === 0) {
       return res
@@ -144,12 +150,10 @@ const listAppointmentsByPatient = async (req, res, next) => {
         .json({ message: "No se encontraron turnos para este paciente." });
     }
 
-    res.status(200).json({ appointments: appointments });
+    res.status(200).json({ appointments });
   } catch (error) {
     console.log(error);
-    return next(
-      new HttpError("No se pudieron listar los turnos del paciente.", 500)
-    );
+    return next(new HttpError("No se pudieron listar los turnos del paciente.", 500));
   }
 };
 
@@ -215,13 +219,19 @@ const cancelAppointment = async (req, res, next) => {
 
 const getCanceledAppointmentsByUser = async (req, res, next) => {
   const { userId } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
 
   try {
-    // Buscar todos los turnos cancelados por el usuario
+    const skip = (page - 1) * limit;
+
+    // Buscar todos los turnos cancelados por el usuario con paginación
     const canceledAppointments = await Appointment.find({
       user: userId,
       status: "canceled",
-    });
+    })
+    .skip(skip)
+    .limit(limit);
 
     res.status(200).json({ canceledAppointments });
   } catch (error) {

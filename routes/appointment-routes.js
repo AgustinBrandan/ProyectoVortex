@@ -60,27 +60,28 @@ router.get(
 
 // ENDPOINT SOLO PARA PACIENTES
 
-// Mostrar Turnos del paciente
-router.get(
-  "/patient/:userId",
-  checkRole("user"),
-  appointmentController.listAppointmentsByPatient
-);
 // Reservar un turno
 router.patch(
-  "/reservar/:appointmentId",
+  "/reserve/:appointmentId",
   checkRole("user"),
   appointmentController.reserveAppointment
 );
 // Cancelar turno
 router.patch(
-  "/cancelar/:appointmentId",
+  "/cancel/:appointmentId",
   checkRole("user"),
   appointmentController.cancelAppointment
 );
 
+// Mostrar Turnos del paciente
 router.get(
-  "/cancelaciones/:userId",
+  "/patient",
+  checkRole("user"),
+  appointmentController.listAppointmentsByPatient
+);
+
+router.get(
+  "/cancellations/:userId",
   appointmentController.getCanceledAppointmentsByUser
 );
 
