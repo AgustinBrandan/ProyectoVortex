@@ -136,7 +136,7 @@ const sendRecoveryEmail = async (req, res, next) => {
 
     await user.save();
 
-    const resetLink = `http://localhost:5000/api/user/reset-password/${token}`; // URL de tu ruta de restablecimiento de contraseña
+    const resetLink = `http://localhost:3000/resetpassword`; // URL de tu ruta de restablecimiento de contraseña
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -172,12 +172,12 @@ const resetPassword = async (req, res, next) => {
     return res.status(422).json({ errors: errorMessages });
   }
 
-  const token = req.params.token;
-  const { newPassword } = req.body;
+  // const token = req.params.token;
+  const { resetToken,newPassword } = req.body;
 
   try {
     const user = await User.findOne({
-      resetToken: token,
+      resetToken: resetToken,
       resetTokenExpiration: { $gt: Date.now() },
     });
 
