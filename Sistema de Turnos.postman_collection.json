@@ -160,7 +160,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"newPassword\":\"123456\"\r\n}",
+							"raw": "{\r\n    \"resetToken\":\"coq0kuXKGa35VZu3cGrR\"\r\n    \"newPassword\":\"123456\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
