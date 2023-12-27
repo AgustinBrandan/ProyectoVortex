@@ -104,10 +104,7 @@ const login = async (req, res, next) => {
   try {
     const existingUser = await User.findByCredentials(email, password);
 
-    if (
-      existingUser.error === "Este usuario no existe" ||
-      existingUser.error === "Credenciales incorrectas"
-    ) {
+    if (existingUser.error) {
       return res.status(401).json({ error: existingUser.error });
     }
 
