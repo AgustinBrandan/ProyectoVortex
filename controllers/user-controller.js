@@ -104,6 +104,13 @@ const login = async (req, res, next) => {
   try {
     const existingUser = await User.findByCredentials(email, password);
 
+    if (
+      existingUser.error === "Este usuario no existe" ||
+      existingUser.error === "Credenciales incorrectas"
+    ) {
+      return res.status(401).json({ error: existingUser.error });
+    }
+
     const token = await existingUser.generateAuthToken();
 
     res.json({ userId: existingUser.id, email: existingUser.email, token });
@@ -173,7 +180,7 @@ const resetPassword = async (req, res, next) => {
   }
 
   // const token = req.params.token;
-  const { resetToken,newPassword } = req.body;
+  const { resetToken, newPassword } = req.body;
 
   try {
     const user = await User.findOne({

@@ -38,12 +38,14 @@ userSchema.statics.findByCredentials = async function (email, password) {
   const existingUser = await User.findOne({ email });
 
   if (!existingUser) {
-    throw new Error("Este usuario no existe");
+    // throw new Error("Este usuario no existe");
+    return { error: "Este usuario no existe" };
   }
 
   const isValidPassword = await bcrypt.compare(password, existingUser.password);
   if (!isValidPassword) {
-    throw new Error("Credenciales incorrectas");
+    // throw new Error("Credenciales incorrectas");
+    return { error: "Credenciales incorrectas" };
   }
   return existingUser;
 };

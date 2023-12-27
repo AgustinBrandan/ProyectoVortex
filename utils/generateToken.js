@@ -1,4 +1,4 @@
-// Esta función genera un token aleatorio (puede ser más compleja según tus requerimientos)
+
 const generateUniqueToken = () => {
   const tokenLength = 20;
   const characters =
